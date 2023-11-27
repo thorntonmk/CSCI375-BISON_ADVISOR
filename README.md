@@ -11,7 +11,7 @@ source env/bin/activate
 ```
 Install the requirements
 ```
-pip install < requirements.txt
+pip install -r requirements.txt
 ```
 Start Streamlit server
 ```
