@@ -111,7 +111,7 @@ with cform:
                             index=findCourseIndex(data["course"]),
                             placeholder="---Select a course---")
         year = st.selectbox("Year", range(2000, 2031), index=range(2000, 2031).index(data["year"]), placeholder="---Select an year---")
-        semester = st.selectbox("Semester", range(1,4), index=range(1,4).index(data["semester"]), placeholder="---Select an year---")
+        semester = st.selectbox("Semester", range(1,4), index=range(1,4).index(data["semester"]), placeholder="---Select a semester---")
         assignmentTotal = st.number_input("Assignment Total", min_value=0, max_value=100, step=1, value=data["assignmentTotal"])
         midtermTotal = st.number_input("Midterm Total", min_value=0, max_value=100, step=1, value=data["midtermTotal"])
         finalTotal = st.number_input("Final Total", min_value=0, max_value=100, step=1, value=data["finalTotal"])

@@ -49,6 +49,18 @@ class User:
 
     def setAppointments(self, appointments):
         self._appointments = appointments
+
+    def getUid(self) -> str:
+        return self._uid
+    
+    def getFName(self) -> str:
+        return self._fName
+    
+    def getLName(self) -> str:
+        return self._lName
+    
+    def getRole(self) -> str:
+        return self._role
     
     def createUser(self):
         try:
@@ -70,35 +82,44 @@ class User:
             #Email already exists
             return False
     
-    def getUser(self, uid):
-        user = self.ref.child(uid).get()
+    def getUser(uid):
+        user = db.child(User.collection_name).child(uid).get().val()
         if user is not None:
-            self._uid = uid
-            self._fName = user["fName"]
-            self._lName = user["lName"]
-            self._email = user["email"]
-            self._phone = user["phone"]
-            self._role = user["role"]
-            self._appointments = user["appointments"]
-            self._notifications = user["notifications"]
+            us = User()
+            us.setUid(uid)
+            us.setFName(user["fName"])
+            us.setLName(user["lName"])
+            us.setEmail(user["email"])
+            us.setPhone(user["phone"])
+            us.setRole(user["role"])
+            if "appointments" in user:
+                us.setAppointments(user["appointments"])
+            if "notifications" in user:
+                us.setNotifications(user["notifications"])
 
-            return self
+            return us
         else:
             raise ValueError("Provided uid does not exist")
         
-    def getAllUsers(self):
-        users = self.ref.get()
+    def getAllUsers():
+        users = db.child(User.collection_name).get().each()
 
         userList = []
         for u in users:
-            user = User()
-            user.setFName(u["fName"])
-            user.setLName(u["lName"])
-            user.setEmail(u["email"])
-            user.setPhone(u["phone"])
-            user.setRole(u["role"])
-            user.setAppointments(u["appointments"])
-            user.setNotifications(u["notifications"])
+            c = {}
+            c["uid"] = u.key()
+            c["fName"] = u.val()["fName"]
+            c["lName"] = u.val()["lName"]
+            c["email"] = u.val()["email"]
+            c["phone"] = u.val()["phone"]
+            c["role"] = u.val()["role"]
+            if "appointments" in u.val():
+                c["appointments"] = u.val()["appointments"]
+            if "notifications" in u.val():
+                c["notifications"] = u.val()["notifications"]
+            userList.append(c)
+
+        return userList
     
     def login(email, password):
         try:
@@ -108,10 +129,10 @@ class User:
             return False
     
     def get_current_user_details(st):
-        uid = st.session_state["current_user_id"]
-        if not uid:
+        if "current_user_id" not in st.session_state:
             return None
         else:
+            uid = st.session_state["current_user_id"]
             userInfo = db.child(User.collection_name).child(uid).get().val()
             user = User()
             user.setUid(uid)
@@ -120,8 +141,10 @@ class User:
             user.setEmail(userInfo['email'])
             user.setPhone(userInfo['phone'])
             user.setRole(userInfo['role'])
-            user.setAppointments(userInfo['appointments'])
-            user.setNotifications(userInfo['notifications'])
+            if "appointments" in userInfo:
+                user.setAppointments(userInfo['appointments'])
+            if "notifications" in userInfo:
+                user.setNotifications(userInfo['notifications'])
 
             return user
     
