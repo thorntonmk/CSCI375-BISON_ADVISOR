@@ -124,5 +124,26 @@ class User:
             user.setNotifications(userInfo['notifications'])
 
             return user
+    
+    def get_students() -> list:
+        students = db.child(User.collection_name).order_by_child("role").equal_to("Student").get().each()
+        if students is None:
+            return []
+        students_list = []
+        for student in students:
+            c = {}
+            c["uid"] = student.key()
+            c["fName"] = student.val()["fName"]
+            c["lName"] = student.val()["lName"]
+            c["email"] = student.val()["email"]
+            c["phone"] = student.val()["phone"]
+            c["role"] = student.val()["role"]
+            if "appointments" in student.val():
+                c["appointments"] = student.val()["appointments"]
+            if "notifications" in student.val():
+                c["notifications"] = student.val()["notifications"]
+
+            students_list.append(c)
+        return students_list
             
             

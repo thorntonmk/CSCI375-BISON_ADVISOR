@@ -2,13 +2,14 @@
 """
 import streamlit as st
 from LoginForm import login_form
+import pages.dashboard as dashboard
 
 def is_logged_in():
     if "authenticated" not in st.session_state:
         return False
     else:
         if st.session_state["authenticated"]:
-            authenticate = True
+            return True
         else:
             return False
 

@@ -71,6 +71,6 @@ with st.form("user_form"):
 
             result = user.createUser()
             if not result:
-                st.error("COuld not create user: Email already exists")
+                st.error("Could not create user: Email already exists")
             else:
                 st.success("User created successfully")
