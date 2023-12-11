@@ -17,6 +17,7 @@ class User:
         self._password = ""
         self._notifications = []
         self._appointments=[]
+        self._courses = []
 
     def setUid(self, uid):
         self._uid = uid
@@ -49,6 +50,9 @@ class User:
 
     def setAppointments(self, appointments):
         self._appointments = appointments
+    
+    def setCourses(self, courses):
+        self._courses = courses
 
     def getUid(self) -> str:
         return self._uid
@@ -62,6 +66,9 @@ class User:
     def getRole(self) -> str:
         return self._role
     
+    def getCourses(self) -> list:
+        return self._courses
+    
     def createUser(self):
         try:
             us = auth.create_user_with_email_and_password(email=self._email, password=self._password)
@@ -74,7 +81,8 @@ class User:
                 "phone": self._phone,
                 "role": self._role,
                 "notifications": self._notifications,
-                "appointments": self._appointments
+                "appointments": self._appointments,
+                "courses": self._courses
             })
             #save to realtime db
             return self
@@ -96,6 +104,8 @@ class User:
                 us.setAppointments(user["appointments"])
             if "notifications" in user:
                 us.setNotifications(user["notifications"])
+            if "courses" in user:
+                us.setCourses(user["courses"])
 
             return us
         else:
@@ -117,6 +127,9 @@ class User:
                 c["appointments"] = u.val()["appointments"]
             if "notifications" in u.val():
                 c["notifications"] = u.val()["notifications"]
+            if "courses" in u.val():
+                c["courses"] = u.val()["courses"]
+
             userList.append(c)
 
         return userList
@@ -145,6 +158,9 @@ class User:
                 user.setAppointments(userInfo['appointments'])
             if "notifications" in userInfo:
                 user.setNotifications(userInfo['notifications'])
+            if "courses" in userInfo:
+                user.setCourses(userInfo["courses"])
+
 
             return user
     
@@ -165,8 +181,20 @@ class User:
                 c["appointments"] = student.val()["appointments"]
             if "notifications" in student.val():
                 c["notifications"] = student.val()["notifications"]
+            if "courses" in student.val():
+                c["courses"] = student.val()["courses"]
 
             students_list.append(c)
         return students_list
+    
+    def updateUser(uid, json):
+        try:
+            db.child(User.collection_name).child(uid).update(json)
+            return True
+        except:
+            return False
+    
+    def send_password_reset_email(email):
+        auth.send_password_reset_email(email)
             
             

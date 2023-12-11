@@ -7,8 +7,10 @@ import pandas as pd
 import numpy as np
 
 from models.Course import Course
+from models.Settings import Settings
+from models.User import User
 
-clist, cform = st.tabs(["List", "Form"])
+clist, cform, cRegister = st.tabs(["Courses", "Edit Course", "Register For Courses"])
 
 st.session_state["all_courses"] = Course.courses_to_json()
 
@@ -102,3 +104,59 @@ with cform:
             st.session_state["selected_course_row"] = None
         else:
             st.error("Could not delete. Course does not exist")
+
+with cRegister:
+    def formatcourse(option):
+        return f'{option["name"]}'
+    if "current_settings" not in st.session_state:
+        st.session_state["current_settings"] = Settings.getSettings()
+    
+    c_period_container = st.container()
+
+    with c_period_container:
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.text_input("Current Year", str(st.session_state["current_settings"].getCurrentYear()), disabled=True)
+        with col2:
+            st.text_input("Current Semester", f'{st.session_state["current_settings"].getCurrentSemester()} Semester', disabled=True)
+
+        if "authenticated" not in st.session_state:
+            st.error("Not Logged in!")
+        else:
+            def formatUser(option):
+                return f'{option["fName"]} {option["lName"]}'
+            currentUser = User.getUser(st.session_state["current_user_id"])
+            currentCourses = Course.courses_to_json()
+            if currentUser.getRole().__eq__("Admin"):
+                student = st.selectbox("Select A Student", options=User.get_students(), index=None, format_func=formatUser, placeholder="Select one")
+                course = st.selectbox("Select A Course", options=currentCourses, index=None, format_func=formatcourse, placeholder="Select one")
+
+                register = st.button("Register Course")
+                if register:
+                    if student is None:
+                        st.error("Student is required")
+                    elif course is None:
+                        st.error("Course is required")
+                    else:
+                        res = Course.register_student_for_course(currentUser.getUid(), course["code"], course["prerequisites"])
+                        if type(res) == str:
+                            st.error(res)
+                        else:
+                            st.success("Course registered successfully")
+
+            else:
+                st.text_input("Student", f'{currentUser.getFName()} {currentUser.getLName()}', disabled=True)
+                course = st.selectbox("Select A Course", options=currentCourses, format_func=formatcourse, index=None, placeholder="Select one")
+
+                register = st.button("Register Course")
+                if register:
+                    if course is None:
+                        st.error("Course is required")
+                    else:
+                        res = Course.register_student_for_course(currentUser.getUid(), course["code"], course["prerequisites"])
+                        if type(res) == str:
+                            st.error(res)
+                        else:
+                            st.success("Course registered successfully")
+    

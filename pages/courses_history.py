@@ -80,12 +80,13 @@ with clist:
 
 with cform:
     st.header("Save Course Details")
+    sems = ["Fall", "Spring", "Summer", "Winter"]
     form_valid = False
     if "selected_course_history_row" not in st.session_state or len(st.session_state["selected_course_history_row"]) == 0:
         data = {
             "course": "",
             "student": "",
-            "year": 2000,
+            "year": 2010,
             "semester": 1,
             "assignmentTotal": 0,
             "midtermTotal": 0,
@@ -95,7 +96,7 @@ with cform:
         data = {
             "course": st.session_state["selected_course_history_row"][0]["course"],
             "student": st.session_state["selected_student"]["uid"],
-            "year": st.session_state["selected_course_history_row"][0]["year"],
+            "year": int(st.session_state["selected_course_history_row"][0]["year"]),
             "semester": st.session_state["selected_course_history_row"][0]["semester"],
             "assignmentTotal": int(st.session_state["selected_course_history_row"][0]["assignmentTotal"]),
             "midtermTotal": int(st.session_state["selected_course_history_row"][0]["midtermTotal"]),
@@ -111,7 +112,7 @@ with cform:
                             index=findCourseIndex(data["course"]),
                             placeholder="---Select a course---")
         year = st.selectbox("Year", range(2000, 2031), index=range(2000, 2031).index(data["year"]), placeholder="---Select an year---")
-        semester = st.selectbox("Semester", range(1,4), index=range(1,4).index(data["semester"]), placeholder="---Select a semester---")
+        semester = st.selectbox("Semester", sems, index=sems.index(data["semester"]), placeholder="---Select a semester---")
         assignmentTotal = st.number_input("Assignment Total", min_value=0, max_value=100, step=1, value=data["assignmentTotal"])
         midtermTotal = st.number_input("Midterm Total", min_value=0, max_value=100, step=1, value=data["midtermTotal"])
         finalTotal = st.number_input("Final Total", min_value=0, max_value=100, step=1, value=data["finalTotal"])
