@@ -80,7 +80,9 @@ def dashboard():
     else:
         st.markdown(f'# {st.session_state["current_page"]}')
 
-    if st.session_state["current_page"].__eq__("Appointments"):
+    if st.session_state["current+page"].__eq__("Dashboard"):
+        dash_info()
+    elif st.session_state["current_page"].__eq__("Appointments"):
         appointments()
     elif st.session_state["current_page"].__eq__("Courses"):
         courses()
@@ -101,6 +103,9 @@ def dashboard():
     #sidebar
     st.sidebar.header("Dashboard")
     home_clicked = st.sidebar.button("Home", type="secondary", use_container_width=True)
+    if home_clicked:
+        st.session_state["current_page"] = "Dashboard"
+        st.rerun()
     appointments_clicked = st.sidebar.button("Appointments", type="secondary", use_container_width=True)
     if(appointments_clicked):
         st.session_state["current_page"] = "Appointments"
