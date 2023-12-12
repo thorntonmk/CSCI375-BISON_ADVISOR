@@ -25,7 +25,7 @@ def main():
     maindoc = open('CS courses.pdf', 'rb')
     option = st.selectbox(
         'What do you want?',
-        ('Course', 'Study', "Risk"))
+        ('Course', 'Questions', "Risk"))
 
     if option == "Course":
         return courses(maindoc)
@@ -56,7 +56,7 @@ def courses(pdf):
 
         # create embeddings
         embeddings = OpenAIEmbeddings()
-        knowledge_base = FAISS.from_texts(chunks, embeddings)
+        knowledge_base = FAISS.from_texts(chunks, embeddings,)
 
         user_question = st.text_input("What questions do you have about your curriculum? ")  # User input
 
@@ -117,7 +117,7 @@ def study():
     # initialize message history
     if "messages" not in st.session_state:
         st.session_state.messages = [
-            SystemMessage(content="You are a helpful assistant.")
+            SystemMessage(content="You are a study assistant.")
         ]
 
     st.header("Welcome to Bison AI")
@@ -130,8 +130,7 @@ def study():
         st.session_state.messages.append(HumanMessage(content=user_input))
         with st.spinner("Thinking..."):
             response = chat(st.session_state.messages)
-        st.session_state.messages.append(
-            AIMessage(content=response.content))
+        st.session_state.messages.append(AIMessage(content=response.content))
 
     # display message history
     messages = st.session_state.get('messages', [])
