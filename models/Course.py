@@ -1,4 +1,9 @@
 from firebase import firebase
+import sys
+sys.path.append("./")
+
+from models.CourseHistory import CourseHistory
+from models.Settings import Settings
 
 db = firebase.database()
 
@@ -93,4 +98,27 @@ class Course:
         except:
             return False
     
-    
+    def register_student_for_course(student_id: str, course_id: str, prereqs: list):
+        #check if prerequisites are met
+        for prereq in prereqs:
+            exists = db.child(CourseHistory.collection_name).order_by_child("student").equal_to(student_id).order_by_child("course").equal_to(prereq).get().each()
+            print(str(exists))
+            if len(exists) == 0:
+                return f'Prerequisite {prereq} not met'
+        # check if student has done it and save if not
+        settings = Settings.getSettings()
+        courseH = CourseHistory()
+        courseH.setStudentId(student_id)
+        courseH.setCourseId(course_id)
+        courseH.setYear(str(settings.getCurrentYear()))
+        courseH.setSemester(settings.getCurrentSemester())
+        courseH.setAssignmentTotal(0)
+        courseH.setMidTermTotal(0)
+        courseH.setFinalTotal(0)
+
+        try:
+            courseH.saveData()
+            return True
+        except ValueError as e:
+            print(e)
+            return "Student has done this course"

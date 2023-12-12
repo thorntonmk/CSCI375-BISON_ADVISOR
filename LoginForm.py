@@ -52,8 +52,9 @@ def login_form():
                     st.success("Logged in successfully")
                     st.session_state["current_user_id"] = result
                     st.session_state["authenticated"] = True
-                    switch_page("dashboard")
+                    st.rerun()
                 else:
                     st.error("Incorrect email or password")
                     st.session_state["authenticated"] = False
+        
                     

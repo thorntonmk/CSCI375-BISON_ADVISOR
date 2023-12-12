@@ -2,7 +2,9 @@
 """
 import streamlit as st
 from LoginForm import login_form
-import pages.dashboard as dashboard
+from views.dashboard import dashboard
+
+from streamlit_extras.switch_page_button import switch_page
 
 def is_logged_in():
     if "authenticated" not in st.session_state:
