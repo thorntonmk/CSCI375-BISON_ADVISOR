@@ -17,6 +17,7 @@ class User:
         self._password = ""
         self._notifications = []
         self._appointments=[]
+        self._courses = []
 
     def setUid(self, uid):
         self._uid = uid
@@ -50,6 +51,24 @@ class User:
     def setAppointments(self, appointments):
         self._appointments = appointments
     
+    def setCourses(self, courses):
+        self._courses = courses
+
+    def getUid(self) -> str:
+        return self._uid
+    
+    def getFName(self) -> str:
+        return self._fName
+    
+    def getLName(self) -> str:
+        return self._lName
+    
+    def getRole(self) -> str:
+        return self._role
+    
+    def getCourses(self) -> list:
+        return self._courses
+    
     def createUser(self):
         try:
             us = auth.create_user_with_email_and_password(email=self._email, password=self._password)
@@ -62,7 +81,8 @@ class User:
                 "phone": self._phone,
                 "role": self._role,
                 "notifications": self._notifications,
-                "appointments": self._appointments
+                "appointments": self._appointments,
+                "courses": self._courses
             })
             #save to realtime db
             return self
@@ -70,35 +90,49 @@ class User:
             #Email already exists
             return False
     
-    def getUser(self, uid):
-        user = self.ref.child(uid).get()
+    def getUser(uid):
+        user = db.child(User.collection_name).child(uid).get().val()
         if user is not None:
-            self._uid = uid
-            self._fName = user["fName"]
-            self._lName = user["lName"]
-            self._email = user["email"]
-            self._phone = user["phone"]
-            self._role = user["role"]
-            self._appointments = user["appointments"]
-            self._notifications = user["notifications"]
+            us = User()
+            us.setUid(uid)
+            us.setFName(user["fName"])
+            us.setLName(user["lName"])
+            us.setEmail(user["email"])
+            us.setPhone(user["phone"])
+            us.setRole(user["role"])
+            if "appointments" in user:
+                us.setAppointments(user["appointments"])
+            if "notifications" in user:
+                us.setNotifications(user["notifications"])
+            if "courses" in user:
+                us.setCourses(user["courses"])
 
-            return self
+            return us
         else:
             raise ValueError("Provided uid does not exist")
         
-    def getAllUsers(self):
-        users = self.ref.get()
+    def getAllUsers():
+        users = db.child(User.collection_name).get().each()
 
         userList = []
         for u in users:
-            user = User()
-            user.setFName(u["fName"])
-            user.setLName(u["lName"])
-            user.setEmail(u["email"])
-            user.setPhone(u["phone"])
-            user.setRole(u["role"])
-            user.setAppointments(u["appointments"])
-            user.setNotifications(u["notifications"])
+            c = {}
+            c["uid"] = u.key()
+            c["fName"] = u.val()["fName"]
+            c["lName"] = u.val()["lName"]
+            c["email"] = u.val()["email"]
+            c["phone"] = u.val()["phone"]
+            c["role"] = u.val()["role"]
+            if "appointments" in u.val():
+                c["appointments"] = u.val()["appointments"]
+            if "notifications" in u.val():
+                c["notifications"] = u.val()["notifications"]
+            if "courses" in u.val():
+                c["courses"] = u.val()["courses"]
+
+            userList.append(c)
+
+        return userList
     
     def login(email, password):
         try:
@@ -108,10 +142,10 @@ class User:
             return False
     
     def get_current_user_details(st):
-        uid = st.session_state["current_user_id"]
-        if not uid:
+        if "current_user_id" not in st.session_state:
             return None
         else:
+            uid = st.session_state["current_user_id"]
             userInfo = db.child(User.collection_name).child(uid).get().val()
             user = User()
             user.setUid(uid)
@@ -120,8 +154,13 @@ class User:
             user.setEmail(userInfo['email'])
             user.setPhone(userInfo['phone'])
             user.setRole(userInfo['role'])
-            user.setAppointments(userInfo['appointments'])
-            user.setNotifications(userInfo['notifications'])
+            if "appointments" in userInfo:
+                user.setAppointments(userInfo['appointments'])
+            if "notifications" in userInfo:
+                user.setNotifications(userInfo['notifications'])
+            if "courses" in userInfo:
+                user.setCourses(userInfo["courses"])
+
 
             return user
     
@@ -142,8 +181,20 @@ class User:
                 c["appointments"] = student.val()["appointments"]
             if "notifications" in student.val():
                 c["notifications"] = student.val()["notifications"]
+            if "courses" in student.val():
+                c["courses"] = student.val()["courses"]
 
             students_list.append(c)
         return students_list
+    
+    def updateUser(uid, json):
+        try:
+            db.child(User.collection_name).child(uid).update(json)
+            return True
+        except:
+            return False
+    
+    def send_password_reset_email(email):
+        auth.send_password_reset_email(email)
             
             
