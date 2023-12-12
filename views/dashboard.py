@@ -38,7 +38,8 @@ def dash_info():
                 {
                     border: 1px solid white;
                     border-radius: 0.5rem;
-                    padding: calc(1em - 1px);
+                    padding: 20px;
+                    overflow: hidden;
                 }
                 """):
                 st.header("Total Courses", divider=True)
@@ -49,7 +50,8 @@ def dash_info():
             {
                 border: 1px solid white;
                 border-radius: 0.5rem;
-                padding: calc(1em - 1px);
+                padding: 20px;
+                overflow: hidden;
             }
             """):
                 st.header("Currrent Courses", divider=True)
@@ -58,6 +60,7 @@ def dash_info():
         #appointments
         st.session_state["appointments"] = Appointment.getAppointments(user.getUid())
         st.markdown("# My Appointments")
+        st.divider()
         for appointment in st.session_state["appointments"]["received"]:
             cont = st.container()
             with cont:
@@ -80,7 +83,7 @@ def dashboard():
     else:
         st.markdown(f'# {st.session_state["current_page"]}')
 
-    if st.session_state["current+page"].__eq__("Dashboard"):
+    if st.session_state["current_page"].__eq__("Dashboard"):
         dash_info()
     elif st.session_state["current_page"].__eq__("Appointments"):
         appointments()
