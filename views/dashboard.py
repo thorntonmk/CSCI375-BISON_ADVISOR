@@ -9,13 +9,69 @@ from views.notifications import notifications
 from views.resources import resources
 from views.settings import settings
 from views.users import users
+from streamlit_extras.stylable_container import stylable_container
+
+from models.User import User
+from models.CourseHistory import CourseHistory
+from models.Settings import Settings
+from models.Appointment import Appointment
 
 def logout():
     st.session_state.clear()
     switch_page("app")
-    
+
 def dash_info():
-    pass
+    user = User.get_current_user_details(st)
+    settings = Settings.getSettings()
+    if user is None:
+        st.error("Not logged in!")
+    else:
+        st.session_state["my_courses"] = CourseHistory.getCoursesByStudent(user.getUid())
+        current = []
+        for course in st.session_state["my_courses"]:
+            if course["year"].__eq__(str(settings.getCurrentYear())) and course["semester"].__eq__(settings.getCurrentSemester()):
+                current.append(course)
+
+        card1, card2 = st.columns(2)
+        with card1:
+            with stylable_container("tcourses", css_styles="""
+                {
+                    border: 1px solid white;
+                    border-radius: 0.5rem;
+                    padding: calc(1em - 1px);
+                }
+                """):
+                st.header("Total Courses", divider=True)
+                st.write(str(len(st.session_state["my_courses"])))
+
+        with card2:
+            with stylable_container("tcourses", css_styles="""
+            {
+                border: 1px solid white;
+                border-radius: 0.5rem;
+                padding: calc(1em - 1px);
+            }
+            """):
+                st.header("Currrent Courses", divider=True)
+                st.write(str(len(current)))
+
+        #appointments
+        st.session_state["appointments"] = Appointment.getAppointments(user.getUid())
+        st.markdown("# My Appointments")
+        for appointment in st.session_state["appointments"]["received"]:
+            cont = st.container()
+            with cont:
+                st.write(appointment["description"])
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    usr = User.getUser(appointment["appointer"])
+                    st.write(f'From: {usr.getFName()} {usr.getLName()}')
+                with col2:
+                    st.write(f'Confirmed: {appointment["confirmed"]}')
+                with col3:
+                    st.write(f'{appointment["date"]} {appointment["time"]}')
+            st.divider()
+
 
 def dashboard():
     if "current_page" not in st.session_state:

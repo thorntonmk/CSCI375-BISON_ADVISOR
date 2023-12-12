@@ -44,6 +44,7 @@ def notifications():
                         if btn:
                             Notification.MarkAsRead(notification["uid"])
                 count += 1
+                st.divider()
         
         with sent:
             if st.button("Reload", key=2):
@@ -60,6 +61,7 @@ def notifications():
                         st.write(f'Priority: {notification["priority"]}')
                     with col3:
                         st.write(datetime.fromtimestamp(int(notification["datetime"])))
+                st.divider()
 
         
         with send:

@@ -39,6 +39,7 @@ def appointments():
                         st.write(f'Confirmed: {appointment["confirmed"]}')
                     with col3:
                         st.write(f'{appointment["date"]} {appointment["time"]}')
+                st.divider()
             
             for appointment in st.session_state["appointments"]["sent"]:
                 cont = st.container()
@@ -52,6 +53,7 @@ def appointments():
                         st.write(f'Confirmed: {appointment["confirmed"]}')
                     with col3:
                         st.write(f'{appointment["date"]} {appointment["time"]}')
+                st.divider()
 
         with received:
             if st.button("Reload", key=1):
@@ -74,6 +76,7 @@ def appointments():
                         if btn:
                             Appointment.ConfirmAppointment(appointment["uid"])
                 count += 1
+                st.divider()
 
         with sent:
             if st.button("Reload", key=2):
@@ -91,6 +94,7 @@ def appointments():
                         st.write(f'Confirmed: {appointment["confirmed"]}')
                     with col3:
                         st.write(f'{appointment["date"]} {appointment["time"]}')
+                st.divider()
         
         with send:
             st.header("Create Appointment")
