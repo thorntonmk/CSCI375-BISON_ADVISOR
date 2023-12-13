@@ -56,7 +56,7 @@ def courses(pdf):
 
         # create embeddings
         embeddings = OpenAIEmbeddings()
-        knowledge_base = FAISS.from_texts(chunks, embeddings,)
+        knowledge_base = FAISS.from_texts(chunks, embeddings)
 
         user_question = st.text_input("What questions do you have about your curriculum? ")  # User input
 
@@ -92,7 +92,7 @@ def risk():
 
         # show user input
 
-        user_question = st.text_input("What questions do you have about studying")  # User input
+        user_question = st.text_input("How May I Help You? ")  # User input
         if user_question:
             docs = knowledge_base.similarity_search(user_question)
 
@@ -112,7 +112,7 @@ def init():
 def study():
     init()
 
-    chat = ChatOpenAI(temperature=0)
+    chat = ChatOpenAI(temperature=0, )
 
     # initialize message history
     if "messages" not in st.session_state:
